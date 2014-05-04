@@ -1,0 +1,24 @@
+.row
+  .col-md-8
+    .ui-box
+      .title
+        Vapors (#{@vapors.count})
+        .pull-right
+          = link_to 'New Vapor', new_admin_vapor_path, class: "btn btn-new"
+      %ul.well-list
+        - @vapors.each do |vapor|
+          %li
+            .list-item-name
+              = link_to vapor.path, [:admin, vapor]
+              - if vapor.default?
+                %span.label.label-inverse
+                  Default
+            .pull-right
+              %span.label.label-gray
+                #{vapor.usage.round(2)} MB Used
+              %span.label.label-gray
+                #{number_to_human_size vapor.free_space} Free
+              = link_to 'Edit', edit_admin_vapor_path(vapor), id: "edit_#{dom_id(vapor)}", class: "btn btn-small"
+              = link_to 'Destroy', [:admin, vapor], data: { confirm: remove_vapor_message(vapor) }, method: :delete, class: "btn btn-small btn-remove"
+        - if @vapors.blank?
+          .nothing-here-block 0 vapors matches

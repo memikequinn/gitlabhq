@@ -1,6 +1,10 @@
 class ProjectObserver < BaseObserver
   def after_create(project)
     log_info("#{project.owner.name} created a new project \"#{project.name_with_namespace}\"")
+    unless project.vapor.path == Gitlab.config.gitlab_shell.repos_path
+      # Create a links in the main path
+      Vapors::MoveService.new(Vapor.find_by_path(Gitlab.config.gitlab_shell.repos_path)).symlinks(project)
+    end
   end
 
   def after_update(project)

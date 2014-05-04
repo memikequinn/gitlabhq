@@ -99,6 +99,7 @@ Gitlab::Application.routes.draw do
         put :transfer
       end
     end
+    resources :vapors
 
     root to: "dashboard#index"
   end

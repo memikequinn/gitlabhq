@@ -56,6 +56,10 @@ module ProjectsHelper
     "You are going to remove #{project.name_with_namespace}.\n Removed project CANNOT be restored!\n Are you ABSOLUTELY sure?"
   end
 
+  def remove_vapor_message(vapor)
+    "You are going to remove #{vapor.path}.\n Removed vapors will move a ton of projects, this ok?"
+  end
+
   def project_nav_tabs
     @nav_tabs ||= get_project_nav_tabs(@project, current_user)
   end

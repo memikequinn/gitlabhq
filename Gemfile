@@ -233,3 +233,5 @@ end
 group :production do
   gem "gitlab_meta", '6.0'
 end
+
+gem 'sys-filesystem'

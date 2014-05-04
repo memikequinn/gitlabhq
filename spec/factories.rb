@@ -32,6 +32,7 @@ FactoryGirl.define do
     path { name.downcase.gsub(/\s/, '_') }
     namespace
     creator
+    vapor_id 1
 
     trait :public do
       visibility_level Gitlab::VisibilityLevel::PUBLIC

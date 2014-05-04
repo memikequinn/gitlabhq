@@ -42,7 +42,7 @@ class Project < ActiveRecord::Base
     :issues_enabled, :wall_enabled, :merge_requests_enabled, :snippets_enabled, :issues_tracker_id,
     :wiki_enabled, :visibility_level, :import_url, :last_activity_at, as: [:default, :admin]
 
-  attr_accessible :namespace_id, :creator_id, as: :admin
+  attr_accessible :namespace_id, :creator_id, :vapor_id, as: :admin
 
   acts_as_taggable_on :labels, :issues_default_labels
 
@@ -52,6 +52,7 @@ class Project < ActiveRecord::Base
   belongs_to :creator,      foreign_key: "creator_id", class_name: "User"
   belongs_to :group, -> { where(type: Group) }, foreign_key: "namespace_id"
   belongs_to :namespace
+  belongs_to :vapor
 
   has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event', foreign_key: 'project_id'
   has_one :gitlab_ci_service, dependent: :destroy
@@ -105,6 +106,7 @@ class Project < ActiveRecord::Base
     format: { with: URI::regexp(%w(git http https)), message: "should be a valid url" },
     if: :import?
   validate :check_limit, on: :create
+  validate :default_vapor, on: :create
 
   # Scopes
   scope :without_user, ->(user)  { where("projects.id NOT IN (:ids)", ids: user.authorized_projects.map(&:id) ) }
@@ -561,5 +563,10 @@ class Project < ActiveRecord::Base
 
   def forked_from?(project)
     forked? && project == forked_from_project
+  end
+
+  private
+  def default_vapor
+    self.vapor_id ||= Vapor.default.id
   end
 end

@@ -87,12 +87,29 @@ module TestEnv
       check_if_can_be_merged: true
     )
     Repository.any_instance.stub(
-      size: 12.45
+      size: 12.45,
+      real_path: repos_path.to_s
     )
 
     BaseObserver.any_instance.stub(
       current_user: double("current_user", id: 1)
     )
+
+    Vapor.any_instance.stub(
+        path: repos_path.to_s,
+        id: 1,
+        default: true,
+        tier: 1
+    )
+
+    Vapors::MoveService.stub(
+      symlinks: true
+    )
+
+    Project.any_instance.stub(
+        vapor: double(Vapor, path: repos_path, id: 1, default: true)
+    )
+
   end
 
   def clear_repo_dir(namespace, name)

@@ -14,6 +14,10 @@ class Repository
     @path_to_repo ||= File.join(Gitlab.config.gitlab_shell.repos_path, path_with_namespace + ".git")
   end
 
+  def real_path
+    @real_path ||= Pathname.new(File.join(Gitlab.config.gitlab_shell.repos_path, path_with_namespace)+ ".git").realpath.to_s
+  end
+
   def exists?
     raw_repository
   end

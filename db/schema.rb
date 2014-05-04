@@ -11,10 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140414131055) do
-
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema.define(version: 20140504024653) do
 
   create_table "broadcast_messages", force: true do |t|
     t.text     "message",    null: false
@@ -110,9 +107,9 @@ ActiveRecord::Schema.define(version: 20140414131055) do
 
   create_table "merge_request_diffs", force: true do |t|
     t.string   "state"
-    t.text     "st_commits"
-    t.text     "st_diffs"
-    t.integer  "merge_request_id", null: false
+    t.text     "st_commits",       limit: 2147483647
+    t.text     "st_diffs",         limit: 2147483647
+    t.integer  "merge_request_id",                    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -218,6 +215,7 @@ ActiveRecord::Schema.define(version: 20140414131055) do
     t.integer  "visibility_level",       default: 0,        null: false
     t.boolean  "archived",               default: false,    null: false
     t.string   "import_status"
+    t.integer  "vapor_id"
   end
 
   add_index "projects", ["creator_id"], name: "index_projects_on_creator_id", using: :btree
@@ -252,14 +250,14 @@ ActiveRecord::Schema.define(version: 20140414131055) do
 
   create_table "snippets", force: true do |t|
     t.string   "title"
-    t.text     "content"
-    t.integer  "author_id",                 null: false
+    t.text     "content",    limit: 2147483647
+    t.integer  "author_id",                                    null: false
     t.integer  "project_id"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "file_name"
     t.datetime "expires_at"
-    t.boolean  "private",    default: true, null: false
+    t.boolean  "private",                       default: true, null: false
     t.string   "type"
   end
 
@@ -361,6 +359,14 @@ ActiveRecord::Schema.define(version: 20140414131055) do
   add_index "users_projects", ["project_access"], name: "index_users_projects_on_project_access", using: :btree
   add_index "users_projects", ["project_id"], name: "index_users_projects_on_project_id", using: :btree
   add_index "users_projects", ["user_id"], name: "index_users_projects_on_user_id", using: :btree
+
+  create_table "vapors", force: true do |t|
+    t.string   "path"
+    t.integer  "tier"
+    t.boolean  "default"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "web_hooks", force: true do |t|
     t.string   "url"

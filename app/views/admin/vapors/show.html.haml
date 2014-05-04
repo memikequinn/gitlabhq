@@ -1,0 +1,36 @@
+%h3.page-title
+  Vapor: #{@vapor.path}
+  = link_to edit_admin_vapor_path(@vapor), class: "btn pull-right" do
+    %i.icon-edit
+    Edit
+%hr
+.row
+  .col-md-6
+    .ui-box
+      .title
+        Vapor info:
+      %ul.well-list
+        %li
+          %span.light Path:
+          %strong
+            =@vapor.path
+        %li
+          %span.light Free Space:
+          %strong
+            =number_to_human_size @vapor.free_space
+        %li
+          %span.light Used Space:
+          %strong
+            =number_to_human_size @vapor.usage_mb
+
+    .ui-box
+      .title
+        Vapor projects:
+      %ul.well-list
+        - @vapor.projects.each do |project|
+          %li
+            %strong
+              = link_to project.name, project_path(project)
+            .pull-right
+              %span.label.label-gray
+                = repository_size(project)
