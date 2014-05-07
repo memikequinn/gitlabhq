@@ -25,12 +25,9 @@ module Vapors
         if File.symlink?(new_path)
           FileUtils.rm new_path
         end
-        unless Dir.exists?(File.dirname(new_path))
-          # No -p here because the vapor should already exist
-          Dir.mkdir(File.dirname(new_path))
-        end
-        FileUtils.mv orig_real_path, new_path
-        # Clean up if we're moving back to default
+        FileUtils.mkdir_p(File.dirname(new_path))
+        FileUtils.mv(orig_real_path, File.dirname(new_path)) unless File.exists?(new_path)
+        # Clean up if we're moving back to the path from settings
         if File.symlink?(orig_path)
           FileUtils.rm orig_path
         end
@@ -38,7 +35,7 @@ module Vapors
         if !File.symlink?(orig_path) && !vapor.default?
           File.symlink new_path, orig_path
         end
-        project.update_attribute :vapor_id, vapor.id
+        project.update_attribute :vapor_id, vapor.id unless project.vapor.id == vapor.id
       end
     end
 
@@ -48,6 +45,19 @@ module Vapors
       # Not needed
       return true if project.vapor.path == Gitlab.config.gitlab_shell.repos_path
       File.symlink File.join(project.vapor.path, project.path_with_namespace).to_s + '.git', File.join(vapor.path, project.path_with_namespace) + '.git'
+    end
+
+    def relink(project)
+      return true if project.vapor.path == Gitlab.config.gitlab_shell.repos_path
+      return true unless File.symlink?(project.repository.path_to_repo)
+      project.reload
+      real_path = File.readlink(project.repository.path_to_repo)
+      linked_path = project.repository.path_to_repo # save for after symlink update
+      FileUtils.mv(real_path, File.join(project.vapor.path, "#{project.path_with_namespace}.git"))
+      # remove the old link
+      system("rm #{linked_path}")
+      # create the new symlink
+      File.symlink File.join(project.vapor.path, "#{project.path_with_namespace}.git"), linked_path
     end
 
   end

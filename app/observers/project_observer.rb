@@ -9,7 +9,15 @@ class ProjectObserver < BaseObserver
 
   def after_update(project)
     project.send_move_instructions if project.namespace_id_changed?
-    project.rename_repo if project.path_changed?
+    if project.vapor_id_changed?
+      Vapors::MoveService.new(project.vapor).move(project)
+    end
+    if project.path_changed?
+      # Plain rename
+      project.rename_repo
+      # Move the actual repo
+      Vapors::MoveService.new(project.vapor).relink(project)
+    end
   end
 
   def before_destroy(project)

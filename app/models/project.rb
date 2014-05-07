@@ -492,7 +492,6 @@ class Project < ActiveRecord::Base
   def rename_repo
     old_path_with_namespace = File.join(namespace_dir, path_was)
     new_path_with_namespace = File.join(namespace_dir, path)
-
     if gitlab_shell.mv_repository(old_path_with_namespace, new_path_with_namespace)
       # If repository moved successfully we need to remove old satellite
       # and send update instructions to users.
@@ -514,6 +513,13 @@ class Project < ActiveRecord::Base
       # db changes in order to prevent out of sync between db and fs
       raise Exception.new('repository cannot be renamed')
     end
+  end
+
+  def update_symlink_path
+    return true unless File.symlink?(repository.path_to_repo)
+    old_path_with_namespace = Pathname.new("#{File.join(Gitlab.config.gitlab_shell.repos_path,namespace_dir, path_was)}.git").readlink.to_s
+    new_path_with_namespace = Pathname.new("#{File.join(Gitlab.config.gitlab_shell.repos_path,namespace_dir, path)}.git").readlink.to_s
+    FileUtils.mv(old_path_with_namespace, new_path_with_namespace)
   end
 
   # Reset events cache related to this project

@@ -6,11 +6,6 @@ class Vapor < ActiveRecord::Base
   attr_accessible :path, :tier, :default
   has_many :projects
   validates :path, uniqueness: true, presence: true
-  # validates_each :default do |record, attr, value|
-  #   if value and Vapor.where(default: true).count > 0
-  #     record.errors.add attr, 'There can only be one TRUE default'
-  #   end
-  # end
   before_update :update_when_new_default
   before_create :ensure_dir_exists
   before_destroy :move_off_projects

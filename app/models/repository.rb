@@ -15,7 +15,14 @@ class Repository
   end
 
   def real_path
-    @real_path ||= Pathname.new(File.join(Gitlab.config.gitlab_shell.repos_path, path_with_namespace)+ ".git").realpath.to_s
+    @real_path ||= begin
+      p = Pathname.new(File.join(Gitlab.config.gitlab_shell.repos_path, path_with_namespace)+ ".git")
+      if File.symlink?(p)
+        p.readlink.to_s
+      else
+        p.to_s
+      end
+    end
   end
 
   def exists?
